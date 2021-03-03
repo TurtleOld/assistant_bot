@@ -1,0 +1,4 @@
+aiogram~=2.11.2
+asyncio
+pip
+python-dotenv

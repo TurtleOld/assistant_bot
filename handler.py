@@ -1,10 +1,7 @@
 from main import bot, dp
-from aiogram import Bot, Dispatcher, executor, types
+from aiogram import types
 import aiogram.utils.markdown as fmt
-from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters.state import State, StatesGroup
 
-from aiogram.types import Message
 from variables import admin_id
 
 
