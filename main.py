@@ -1,8 +1,12 @@
 #!/usr/bin/python
 
 import asyncio
-from aiogram import Bot, Dispatcher, executor, types
-from variables import *
+from aiogram import Bot, Dispatcher, executor
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+API_TOKEN = os.getenv("API_TOKEN")
 
 loop = asyncio.get_event_loop()
 

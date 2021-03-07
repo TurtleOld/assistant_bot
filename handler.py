@@ -1,8 +1,11 @@
 from main import bot, dp
 from aiogram import types
 import aiogram.utils.markdown as fmt
+import os
+from dotenv import load_dotenv
 
-from variables import admin_id
+load_dotenv()
+admin_id = os.getenv("admin_id")
 
 
 async def send_to_admin(dp):
