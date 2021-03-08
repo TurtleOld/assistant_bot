@@ -1,3 +1,9 @@
+"""
+В данном скрипте представлен другой скрипт, который был взят с открытого источника
+https://github.com/karvozavr/weather-bot
+"""
+
+
 import datetime
 from main import bot, dp
 from aiogram import types
