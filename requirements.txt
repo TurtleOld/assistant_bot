@@ -1,4 +1,5 @@
 aiogram~=2.11.2
-asyncio
+asyncio~=3.4.3
 pip
-python-dotenv
+python-dotenv~=0.15.0
+aiohttp~=3.7.4.post0
