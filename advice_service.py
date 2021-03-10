@@ -1,4 +1,4 @@
-from weather_service import WeatherInfo
+from weather_service import WeatherInfo, WeatherInfoForecast
 
 temperature_rules = [
     (-10, 'Очень холодно. Одевайте все самое теплое.'),
@@ -47,8 +47,8 @@ def get_advice(weather: WeatherInfo) -> str:
     return advice
 
 
-def get_advice_forecast(weathers: WeatherInfo) -> str:
-    advice_forecast = get_temperature_advice(weathers.temperature)
+def get_advice_forecast(weathers: WeatherInfoForecast) -> str:
+    advice_forecast = get_temperature_advice_forecast(weathers.temperature)
     advice_forecast += '\n'
-    advice_forecast += get_status_advice(weathers.status)
+    advice_forecast += get_status_advice_forecast(weathers.status)
     return advice_forecast
