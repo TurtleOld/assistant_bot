@@ -26,8 +26,8 @@ class WeatherInfo:
 
 class WeatherInfoForecast:
 
-    def __init__(self, date, temperature, status, is_kelvin=True):
-        self.date = date
+    def __init__(self, data_time, temperature, status, is_kelvin=True):
+        self.date = data_time
         self.temperature = kelvin_to_celsius_forecast(
             temperature) if is_kelvin else temperature
         self.status = status
@@ -89,10 +89,9 @@ async def make_weather_service_forecast_query(url: str) -> WeatherInfoForecast:
 
 
 def get_weather_forecast_from_response(json):
-    for i in json['list']:
-        result = i['dt_txt'], '{0:+3.0f}'.format(i['main']['temp']), i['weather'][0]['description']
-        print(result)
-    return WeatherInfoForecast(result)
+    for item in json['list']:
+        result = item['dt_txt'], item['main']['temp'], item['weather'][0]['description']
+        return result[0], kelvin_to_celsius_forecast(result[1]), result[2]
 
 
 def kelvin_to_celsius_forecast(degrees):
