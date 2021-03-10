@@ -1,4 +1,4 @@
-from weather_service import WeatherInfo, WeatherInfoForecast
+from weather_service import WeatherInfo
 
 temperature_rules = [
     (-10, 'Очень холодно. Одевайте все самое теплое.'),
@@ -20,22 +20,8 @@ def get_temperature_advice(temperature: int) -> str:
     return ''
 
 
-def get_temperature_advice_forecast(temperature: int) -> str:
-    for rule, advice_forecast in temperature_rules:
-        if temperature < rule:
-            return advice_forecast
-
-    return ''
-
-
 def get_status_advice(weather: str) -> str:
     if 'дожд' in weather:
-        return 'Возьмите зонтик.'
-    return ''
-
-
-def get_status_advice_forecast(weathers: str) -> str:
-    if 'дожд' in weathers:
         return 'Возьмите зонтик.'
     return ''
 
@@ -45,10 +31,3 @@ def get_advice(weather: WeatherInfo) -> str:
     advice += '\n'
     advice += get_status_advice(weather.status)
     return advice
-
-
-def get_advice_forecast(weathers: WeatherInfoForecast) -> str:
-    advice_forecast = get_temperature_advice_forecast(weathers.temperature)
-    advice_forecast += '\n'
-    advice_forecast += get_status_advice_forecast(weathers.status)
-    return advice_forecast

@@ -9,8 +9,8 @@ from aiogram import types
 import os
 from dotenv import load_dotenv
 from bot_messages import get_message
-from advice_service import get_advice, get_advice_forecast
-from weather_service import WeatherServiceException, WeatherInfo, WeatherInfoForecast, get_weather_for_city, get_weather_city_forecast
+from advice_service import get_advice
+from weather_service import WeatherServiceException, WeatherInfo, get_weather_for_city
 
 WEATHER_RETRIEVAL_FAILED_MESSAGE = get_message('weather_for_location_retrieval_failed')
 
@@ -57,18 +57,4 @@ async def today_date_and_time(message: types.Message):
             get_advice(weather)
 
         await message.reply(response)
-    if "погоду" in result and "будущую" in result:
-        res = result[-1:]
-        city = ''.join(res)
-        try:
-            weathers: WeatherInfoForecast = await get_weather_city_forecast(city)
-        except WeatherServiceException:
-            await message.reply(WEATHER_RETRIEVAL_FAILED_MESSAGE)
-            return
-
-        responses = get_message("weather_in_city_forecast_message") \
-            .format(city, weathers.status, weathers.temperature) + "\n\n" + \
-            get_advice_forecast(weathers)
-        print(responses)
-        await message.reply(responses)
 
