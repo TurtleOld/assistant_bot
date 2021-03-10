@@ -6,7 +6,7 @@ MESSAGES = {
 
     'weather_in_city_message': 'Погода в городе {}:\n{}\nтемпература: {:.1f}°C.',
 
-    'weather_in_city_forecast_message': 'Погода в городе {} на следующие 5 дней:\n{}\nтемпература: {:.1f}°C.',
+    'weather_in_city_forecast_message': 'Погода в городе {} на следующие 5 дней:\n{}\n{}\nтемпература: {:.1f}°C.',
 
     'weather_in_location_message': 'Погода в указанной локации:\n{}\nтемпература: {:.1f}°C.',
 
