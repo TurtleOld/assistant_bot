@@ -43,7 +43,7 @@ async def today_date_and_time(message: types.Message):
         await message.answer(times.strftime("%d-%m-%Y"))
     if "текущую" in result and "дату" in result and "время" in result:
         await message.answer(times.strftime("%d.%m.%Y %H:%M:%S"))
-    if 'погода' in result:
+    if 'погода' in result and 'городе' in result:
         res = result[-1:]
         city = ''.join(res)
         try:
@@ -56,5 +56,5 @@ async def today_date_and_time(message: types.Message):
             .format(city, weather.status, weather.temperature) + '\n\n' + \
             get_advice(weather)
 
-        await message.reply(response)
+        await message.answer(response)
 
