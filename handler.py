@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from bot_messages import get_message
 from advice_service import get_advice
 from weather_service import WeatherServiceException, WeatherInfo, get_weather_for_city
+from keywords import *
 
 WEATHER_RETRIEVAL_FAILED_MESSAGE = get_message('weather_for_location_retrieval_failed')
 
@@ -33,10 +34,10 @@ async def start_help_commands(message: types.Message):
 
 @dp.message_handler()
 async def today_date_and_time(message: types.Message):
-    result = message.text.split(" ")
+    result = message.text
     times = datetime.datetime.now()
-    if "привет" in result or "Привет" in result:
-        await message.answer(f"Привет, {message.from_user.full_name}")
+    if result in dictionary.keys():
+        await message.answer(dictionary.get(result))
     if "сколько" in result and "сейчас" in result and "времени" in result or "текущее" in result and "время" in result:
         await message.answer(times.strftime("%H:%M:%S"))
     if "текущая" in result and "дата" in result:
