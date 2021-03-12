@@ -34,10 +34,12 @@ async def start_help_commands(message: types.Message):
 
 @dp.message_handler()
 async def today_date_and_time(message: types.Message):
-    result = message.text
+    result = message.text.lower()
     times = datetime.datetime.now()
-    if result in dictionary.keys():
-        await message.answer(dictionary.get(result))
+    s = [k for k in dictionary if result in k]
+    string = "".join(s)
+    if string in dictionary.keys():
+        await message.answer(dictionary.get(string))
     if "сколько" in result and "сейчас" in result and "времени" in result or "текущее" in result and "время" in result:
         await message.answer(times.strftime("%H:%M:%S"))
     if "текущая" in result and "дата" in result:
