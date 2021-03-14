@@ -3,10 +3,10 @@
 https://github.com/karvozavr/weather-bot
 """
 
-import datetime
 from main import bot, dp
 from aiogram import types
 import os
+import json
 from dotenv import load_dotenv
 from bot_messages import get_message
 from advice_service import get_advice
@@ -26,21 +26,29 @@ async def send_to_admin(dp):
 @dp.message_handler(commands=["start", "help"])
 async def start_help_commands(message: types.Message):
     await message.answer(f"<b>Что бот умеет?</b>\n\n"
-                         f"Показывает текущую дату, текущее время и погоду!\n"
-                         f"Просто попросите его об этом!\n\n"
-                         f"Для запроса погоды введи - Какая погода в городе Москва, либо любой другой город!\n\n"
+                         f"Показывает текущую погоду\n"
+                         f"Для этого просто введи названия своего города\n\n"
                          f"Введи /start или /help для повторного отображения данного сообщения!")
 
 
 @dp.message_handler()
 async def today_date_and_time(message: types.Message):
     result = message.text.lower().strip(" ")
+    # Основная часть бота, при обычном общении
     if result in dictionary.keys():
         await message.answer(dictionary.get(result))
-    if 'погода' in result and 'городе' in result:
-        splitting = message.text.split()
-        res = splitting[-1:]
-        city = ''.join(res)
+
+    # Отсюда начинается блок погоды
+    city = result.title()
+    with open('cities.json', encoding='utf-8') as json_file:
+        data = json.load(json_file)
+
+    lst = []
+
+    for item in data['city']:
+        cities = item["name"]
+        lst.append(cities)
+    if city in lst:
         try:
             weather: WeatherInfo = await get_weather_for_city(city)
         except WeatherServiceException:
@@ -48,8 +56,7 @@ async def today_date_and_time(message: types.Message):
             return
 
         response = get_message('weather_in_city_message') \
-            .format(city, weather.status, weather.temperature) + '\n\n' + \
-            get_advice(weather)
+                       .format(city, weather.status, weather.temperature) + '\n\n' + \
+                   get_advice(weather)
 
         await message.answer(response)
-
