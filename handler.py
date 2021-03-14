@@ -34,20 +34,12 @@ async def start_help_commands(message: types.Message):
 
 @dp.message_handler()
 async def today_date_and_time(message: types.Message):
-    result = message.text.lower()
-    times = datetime.datetime.now()
-    s = [k for k in dictionary if result in k]
-    string = "".join(s)
-    if string in dictionary.keys():
-        await message.answer(dictionary.get(string))
-    if "сколько" in result and "сейчас" in result and "времени" in result or "текущее" in result and "время" in result:
-        await message.answer(times.strftime("%H:%M:%S"))
-    if "текущая" in result and "дата" in result:
-        await message.answer(times.strftime("%d-%m-%Y"))
-    if "текущую" in result and "дату" in result and "время" in result:
-        await message.answer(times.strftime("%d.%m.%Y %H:%M:%S"))
+    result = message.text.lower().strip(" ")
+    if result in dictionary.keys():
+        await message.answer(dictionary.get(result))
     if 'погода' in result and 'городе' in result:
-        res = result[-1:]
+        splitting = message.text.split()
+        res = splitting[-1:]
         city = ''.join(res)
         try:
             weather: WeatherInfo = await get_weather_for_city(city)
