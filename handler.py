@@ -56,7 +56,7 @@ async def today_date_and_time(message: types.Message):
             return
 
         response = get_message('weather_in_city_message') \
-                       .format(city, weather.status, weather.temperature) + '\n\n' + \
-                   get_advice(weather)
+            .format(city, weather.status, weather.temperature) + '\n\n' + \
+            get_advice(weather)
 
         await message.answer(response)
