@@ -12,7 +12,6 @@ from bot_messages import get_message
 from advice_service import get_advice
 from random import choice
 from weather_service import WeatherServiceException, WeatherInfo, get_weather_for_city
-from keywords import *
 
 WEATHER_RETRIEVAL_FAILED_MESSAGE = get_message('weather_for_location_retrieval_failed')
 
@@ -38,23 +37,23 @@ async def today_date_and_time(message: types.Message):
 
     # Основная часть бота, при обычном общении
     with open('keywords.json', encoding='utf-8') as json_file:
-        data = json.load(json_file)
+        keywords = json.load(json_file)
 
-    if result in data['dictionary']:
-        await message.answer(choice(data["dictionary"][result]))
+    if result in keywords['dictionary']:
+        await message.answer(choice(keywords["dictionary"][result]))
 
     # Отсюда начинается блок погоды
     city = result.title()
     with open('cities.json', encoding='utf-8') as json_file:
-        data = json.load(json_file)
+        cities = json.load(json_file)
 
     lst = []
 
-    for item in data['city']:
+    for item in cities['city']:
         cities = item["name"]
         lst.append(cities)
     # начало блока, если бот не нашёл подходящих слов в json файлах
-    if result not in dictionary.keys() and city not in lst:
+    if result not in keywords['dictionary'] and city not in lst:
         await message.reply("Я не понимаю того, что ты мне говоришь!\nПопробуй перефразировать свой вопрос...")
     # конец блока
     # если город найден в списке, отобразить погоду
