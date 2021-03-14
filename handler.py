@@ -37,9 +37,11 @@ async def today_date_and_time(message: types.Message):
     result = message.text.lower().strip(" ")  # получаем текст сообщения от пользователя
 
     # Основная часть бота, при обычном общении
+    with open('keywords.json', encoding='utf-8') as json_file:
+        data = json.load(json_file)
 
-    if result in dictionary.keys():
-        await message.answer(choice(dictionary.get(result)))
+    if result in data['dictionary']:
+        await message.answer(choice(data["dictionary"][result]))
 
     # Отсюда начинается блок погоды
     city = result.title()
@@ -51,8 +53,11 @@ async def today_date_and_time(message: types.Message):
     for item in data['city']:
         cities = item["name"]
         lst.append(cities)
+    # начало блока, если бот не нашёл подходящих слов в json файлах
     if result not in dictionary.keys() and city not in lst:
         await message.reply("Я не понимаю того, что ты мне говоришь!\nПопробуй перефразировать свой вопрос...")
+    # конец блока
+    # если город найден в списке, отобразить погоду
     if city in lst:
         try:
             weather: WeatherInfo = await get_weather_for_city(city)
