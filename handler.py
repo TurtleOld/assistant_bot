@@ -51,6 +51,10 @@ async def today_date_and_time(message: types.Message):
     for item in data['city']:
         cities = item["name"]
         lst.append(cities)
+    if result not in dictionary.keys() and city not in lst:
+        print("works?")
+        dictionary.update({result: ""})
+        await message.reply("Я не понимаю того, что ты мне говоришь!\nПопробуй перефразировать свой вопрос...")
     if city in lst:
         try:
             weather: WeatherInfo = await get_weather_for_city(city)
@@ -63,3 +67,4 @@ async def today_date_and_time(message: types.Message):
             get_advice(weather)
 
         await message.answer(response)
+
