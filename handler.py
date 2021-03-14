@@ -10,6 +10,7 @@ import json
 from dotenv import load_dotenv
 from bot_messages import get_message
 from advice_service import get_advice
+from random import choice
 from weather_service import WeatherServiceException, WeatherInfo, get_weather_for_city
 from keywords import *
 
@@ -33,10 +34,12 @@ async def start_help_commands(message: types.Message):
 
 @dp.message_handler()
 async def today_date_and_time(message: types.Message):
-    result = message.text.lower().strip(" ")
+    result = message.text.lower().strip(" ")  # получаем текст сообщения от пользователя
+
     # Основная часть бота, при обычном общении
+
     if result in dictionary.keys():
-        await message.answer(dictionary.get(result))
+        await message.answer(choice(dictionary.get(result)))
 
     # Отсюда начинается блок погоды
     city = result.title()
