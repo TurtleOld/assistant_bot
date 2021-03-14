@@ -55,4 +55,3 @@ def get_weather_from_response(json):
 def kelvin_to_celsius(degrees):
     KELVIN_0 = 273.15
     return degrees - KELVIN_0
-
