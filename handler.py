@@ -36,8 +36,9 @@ async def today_date_and_time(message: types.Message):
     result = message.text.lower().strip(" ")  # получаем текст сообщения от пользователя
 
     # Основная часть бота, при обычном общении
-    with open('keywords.json', encoding='utf-8') as json_file:
+    with open('keywords.json', encoding="utf-8") as json_file:
         keywords = json.load(json_file)
+        json_file.close()
 
     if result in keywords['dictionary']:
         await message.answer(choice(keywords["dictionary"][result]))
@@ -46,16 +47,22 @@ async def today_date_and_time(message: types.Message):
     city = result.title()
     with open('cities.json', encoding='utf-8') as json_file:
         cities = json.load(json_file)
+        json_file.close()
 
     lst = []
 
     for item in cities['city']:
         cities = item["name"]
         lst.append(cities)
+
     # начало блока, если бот не нашёл подходящих слов в json файлах
     if result not in keywords['dictionary'] and city not in lst:
+        keywords["dictionary"][result] = ["Новая фраза"]
+        with open("keywords.json", "w") as json_file:
+            json.dump(keywords, json_file, ensure_ascii=False)
         await message.reply("Я не понимаю того, что ты мне говоришь!\nПопробуй перефразировать свой вопрос...")
     # конец блока
+
     # если город найден в списке, отобразить погоду
     if city in lst:
         try:
