@@ -59,7 +59,7 @@ async def today_date_and_time(message: types.Message):
     if result not in keywords['dictionary'] and city not in lst:
         keywords["dictionary"][result] = ["Новая фраза"]
         with open("keywords.json", "w") as json_file:
-            json.dump(keywords, json_file, ensure_ascii=False)
+            json.dump(keywords, json_file, ensure_ascii=False, indent=4, separators=(',', ': '))
         await message.reply("Я не понимаю того, что ты мне говоришь!\nПопробуй перефразировать свой вопрос...")
     # конец блока
 
