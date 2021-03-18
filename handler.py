@@ -43,6 +43,12 @@ async def today_date_and_time(message: types.Message):
     if result in keywords['dictionary']:
         await message.answer(choice(keywords["dictionary"][result]))
 
+    # Условие, когда предложение начинает с обращения к боту через запятую по правилам русского языка
+    if result.startswith("Куся,"):
+        slice_name = result[6:]
+        if slice_name in keywords["dictionary"]:
+            await message.answer(choice((keywords["dictionary"][result])))
+
     # Отсюда начинается блок погоды
     city = result.title()
     with open('cities.json', encoding='utf-8') as json_file:
@@ -72,7 +78,7 @@ async def today_date_and_time(message: types.Message):
             return
 
         response = get_message('weather_in_city_message') \
-            .format(city, weather.status, weather.temperature) + '\n\n' + \
-            get_advice(weather)
+                       .format(city, weather.status, weather.temperature) + '\n\n' + \
+                   get_advice(weather)
 
         await message.answer(response)
