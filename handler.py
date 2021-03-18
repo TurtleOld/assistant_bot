@@ -25,9 +25,13 @@ async def send_to_admin(dp):
 
 @dp.message_handler(commands=["start", "help"])
 async def start_help_commands(message: types.Message):
-    await message.answer(f"<b>Что бот умеет?</b>\n\n"
-                         f"Показывает текущую погоду\n"
+    await message.answer(f"<b>Привет, меня зовут Куся!</b>\n"
+                         f"Я умею общаться с людьми, но пока только учусь, "
+                         f"если чего-то не знаю, я обязательно узнаю :)\n"
+                         f"Но, что я точно умею, так это показывать текущую погоду в твоем городе!\n"
                          f"Для этого просто введи названия своего города\n\n"
+                         f"Желаю хорошего настроения,\n"
+                         f"С уважением, Куся!\n\n"
                          f"Введи /start или /help для повторного отображения данного сообщения!")
 
 
@@ -63,7 +67,7 @@ async def today_date_and_time(message: types.Message):
 
     # начало блока, если бот не нашёл подходящих слов в json файлах
     if result not in keywords['dictionary'] and city not in lst:
-        keywords["dictionary"][result] = ["Новая фраза"]
+        keywords["dictionary"][result] = ["Я всё ещё не понимаю о чем речь, попробуй позже мне это написать!"]
         with open("keywords.json", "w") as json_file:
             json.dump(keywords, json_file, ensure_ascii=False, indent=4, separators=(',', ': '))
         await message.reply("Я не понимаю того, что ты мне говоришь!\nПопробуй перефразировать свой вопрос...")
