@@ -79,7 +79,13 @@ async def today_date_and_time(message: types.Message):
         cities = item["name"]
         lst.append(cities)
 
-
+    # начало блока, если бот не нашёл подходящих слов в json файлах
+    if result not in keywords['dictionary'] and city not in lst and forecast not in keywords['dictionary'] and city_name not in lst:
+        keywords["dictionary"][result] = ["Я всё ещё не понимаю о чем речь, попробуй позже мне это написать!"]
+        with open("keywords.json", "w") as json_file:
+            json.dump(keywords, json_file, ensure_ascii=False, indent=4, separators=(',', ': '))
+        await message.reply("Я не понимаю того, что ты мне говоришь!\nПопробуй перефразировать свой вопрос...")
+    # конец блока
 
     # если город найден в списке, отобразить погоду
     if city in lst:
@@ -116,11 +122,3 @@ async def today_date_and_time(message: types.Message):
             list_append.append(i)
             string_append = "".join(str(x) for x in list_append)
         await message.answer(f"Прогноз погоды в городе {city_name} на 7 дней:\n\n" + string_append)
-
-    # начало блока, если бот не нашёл подходящих слов в json файлах
-    if result not in keywords['dictionary'] and city not in lst:
-        keywords["dictionary"][result] = ["Я всё ещё не понимаю о чем речь, попробуй позже мне это написать!"]
-        with open("keywords.json", "w") as json_file:
-            json.dump(keywords, json_file, ensure_ascii=False, indent=4, separators=(',', ': '))
-        await message.reply("Я не понимаю того, что ты мне говоришь!\nПопробуй перефразировать свой вопрос...")
-    # конец блока
