@@ -83,7 +83,7 @@ async def today_date_and_time(message: types.Message):
     if result not in keywords['dictionary'] and city not in lst and forecast not in keywords['dictionary'] and city_name not in lst:
         keywords["dictionary"][result] = ["Я всё ещё не понимаю о чем речь, попробуй позже мне это написать!"]
         with open("keywords.json", "w") as json_file:
-            json.dump(keywords, json_file, ensure_ascii=False, indent=4, separators=(',', ': '))
+            json.dump(keywords.decode("utf-8"), json_file, ensure_ascii=False, indent=4, separators=(',', ': '))
         await message.reply("Я не понимаю того, что ты мне говоришь!\nПопробуй перефразировать свой вопрос...")
     # конец блока
 
@@ -106,13 +106,19 @@ async def today_date_and_time(message: types.Message):
         func_coord = cityname_to_coord(api_key_coordinates, city_name)
         url_weather = f"https://api.weather.yandex.ru/v2/forecast?lat={func_coord[1]}" \
                       f"&lon={func_coord[0]}&lang=ru&extra=true"
+        with open("weather_conditions.json", "r", encoding="utf-8") as condition:
+            weather_condition = json.load(condition)
         with requests.get(url_weather, headers=headers) as resp:
             json_result = resp.json()
             for item in json_result["forecasts"]:
+                def translate_condition():
+                    eng_cond = item["parts"]["day"]["condition"]
+                    if eng_cond in weather_condition["condition"]:
+                        return weather_condition["condition"][eng_cond]
                 yield f'Дата: {item["date"]}\n' \
                       f'Дневная температура: {item["parts"]["day"]["temp_avg"]}\N{Degree Sign}C\n' \
                       f'Ощущается температура как: {item["parts"]["day"]["feels_like"]}\N{Degree Sign}C\n' \
-                      f'{item["parts"]["day"]["condition"]}\n' \
+                      f'{translate_condition()}\n' \
                       f'Давление: {item["parts"]["day"]["pressure_mm"]} мм\n\n'
 
     if forecast in keywords['dictionary'] and city_name in lst:
