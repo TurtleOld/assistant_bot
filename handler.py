@@ -80,7 +80,8 @@ async def today_date_and_time(message: types.Message):
         lst.append(cities)
 
     # начало блока, если бот не нашёл подходящих слов в json файлах
-    if result not in keywords['dictionary'] and city not in lst and forecast not in keywords['dictionary'] and city_name not in lst:
+    if result not in keywords['dictionary'] and city not in lst and forecast not in keywords[
+        'dictionary'] and city_name not in lst:
         keywords["dictionary"][result] = ["Я всё ещё не понимаю о чем речь, попробуй позже мне это написать!"]
         with open("keywords.json", "w") as json_file:
             json.dump(keywords.decode("utf-8"), json_file, ensure_ascii=False, indent=4, separators=(',', ': '))
@@ -111,15 +112,47 @@ async def today_date_and_time(message: types.Message):
         with requests.get(url_weather, headers=headers) as resp:
             json_result = resp.json()
             for item in json_result["forecasts"]:
-                def translate_condition():
+                def translate_condition_night():
+                    eng_cond = item["parts"]["night"]["condition"]
+                    if eng_cond in weather_condition["condition"]:
+                        return weather_condition["condition"][eng_cond]
+
+                def translate_condition_morning():
+                    eng_cond = item["parts"]["morning"]["condition"]
+                    if eng_cond in weather_condition["condition"]:
+                        return weather_condition["condition"][eng_cond]
+
+                def translate_condition_day():
                     eng_cond = item["parts"]["day"]["condition"]
                     if eng_cond in weather_condition["condition"]:
                         return weather_condition["condition"][eng_cond]
-                yield f'Дата: {item["date"]}\n' \
+
+                def translate_condition_evening():
+                    eng_cond = item["parts"]["evening"]["condition"]
+                    if eng_cond in weather_condition["condition"]:
+                        return weather_condition["condition"][eng_cond]
+
+                yield f'<b>Дата: {item["date"]}\n</b>' \
+                      f'------\n' \
+                      f'Ночная температура: {item["parts"]["night"]["temp_avg"]}\N{Degree Sign}C\n' \
+                      f'Ощущается температура как: {item["parts"]["night"]["feels_like"]}\N{Degree Sign}C\n' \
+                      f'{translate_condition_night()}\n' \
+                      f'Давление: {item["parts"]["night"]["pressure_mm"]} мм\n' \
+                      f'------\n' \
+                      f'Утренняя температура: {item["parts"]["morning"]["temp_avg"]}\N{Degree Sign}C\n' \
+                      f'Ощущается температура как: {item["parts"]["morning"]["feels_like"]}\N{Degree Sign}C\n' \
+                      f'{translate_condition_morning()}\n' \
+                      f'Давление: {item["parts"]["morning"]["pressure_mm"]} мм\n' \
+                      f'------\n' \
                       f'Дневная температура: {item["parts"]["day"]["temp_avg"]}\N{Degree Sign}C\n' \
                       f'Ощущается температура как: {item["parts"]["day"]["feels_like"]}\N{Degree Sign}C\n' \
-                      f'{translate_condition()}\n' \
-                      f'Давление: {item["parts"]["day"]["pressure_mm"]} мм\n\n'
+                      f'{translate_condition_day()}\n' \
+                      f'Давление: {item["parts"]["day"]["pressure_mm"]} мм\n' \
+                      f'------\n' \
+                      f'Вечерняя температура: {item["parts"]["evening"]["temp_avg"]}\N{Degree Sign}C\n' \
+                      f'Ощущается температура как: {item["parts"]["evening"]["feels_like"]}\N{Degree Sign}C\n' \
+                      f'{translate_condition_evening()}\n' \
+                      f'Давление: {item["parts"]["evening"]["pressure_mm"]} мм\n\n'
 
     if forecast in keywords['dictionary'] and city_name in lst:
         func_result = forecast_weather_sevenDays()
