@@ -137,22 +137,22 @@ async def today_date_and_time(message: types.Message):
                       f'Ночная температура: {item["parts"]["night"]["temp_avg"]}\N{Degree Sign}C\n' \
                       f'Ощущается температура как: {item["parts"]["night"]["feels_like"]}\N{Degree Sign}C\n' \
                       f'{translate_condition_night()}\n' \
-                      f'Давление: {item["parts"]["night"]["pressure_mm"]} мм\n' \
+                      f'Давление: {item["parts"]["night"]["pressure_mm"]} мм рт. ст.\n' \
                       f'------\n' \
                       f'Утренняя температура: {item["parts"]["morning"]["temp_avg"]}\N{Degree Sign}C\n' \
                       f'Ощущается температура как: {item["parts"]["morning"]["feels_like"]}\N{Degree Sign}C\n' \
                       f'{translate_condition_morning()}\n' \
-                      f'Давление: {item["parts"]["morning"]["pressure_mm"]} мм\n' \
+                      f'Давление: {item["parts"]["morning"]["pressure_mm"]} мм рт. ст.\n' \
                       f'------\n' \
                       f'Дневная температура: {item["parts"]["day"]["temp_avg"]}\N{Degree Sign}C\n' \
                       f'Ощущается температура как: {item["parts"]["day"]["feels_like"]}\N{Degree Sign}C\n' \
                       f'{translate_condition_day()}\n' \
-                      f'Давление: {item["parts"]["day"]["pressure_mm"]} мм\n' \
+                      f'Давление: {item["parts"]["day"]["pressure_mm"]} мм рт. ст.\n' \
                       f'------\n' \
                       f'Вечерняя температура: {item["parts"]["evening"]["temp_avg"]}\N{Degree Sign}C\n' \
                       f'Ощущается температура как: {item["parts"]["evening"]["feels_like"]}\N{Degree Sign}C\n' \
                       f'{translate_condition_evening()}\n' \
-                      f'Давление: {item["parts"]["evening"]["pressure_mm"]} мм\n\n'
+                      f'Давление: {item["parts"]["evening"]["pressure_mm"]} мм рт. ст.\n\n'
 
     if forecast in keywords['dictionary'] and city_name in lst:
         func_result = forecast_weather_sevenDays()
