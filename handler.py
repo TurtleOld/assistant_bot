@@ -10,10 +10,8 @@ import json
 import requests
 from dotenv import load_dotenv
 from bot_messages import get_message
-from advice_service import get_advice
 from random import choice
-from weather_service import WeatherServiceException, WeatherInfo, get_weather_for_city
-from forecast_weather_settings import cityname_to_coord
+from weather_settings import cityname_to_coord, temperature_rules
 
 WEATHER_RETRIEVAL_FAILED_MESSAGE = get_message('weather_for_location_retrieval_failed')
 
@@ -22,8 +20,6 @@ admin_id = os.getenv("admin_id")
 user_id_required = os.getenv("user_id_required")
 api_key_coordinates = os.getenv("api_key_coordinates")
 api_key_forecast = os.getenv("api_key_forecast")
-
-api_key_coordinates = api_key_coordinates
 
 headers = {
     "X-Yandex-API-Key": api_key_forecast,
@@ -80,27 +76,36 @@ async def today_date_and_time(message: types.Message):
         lst.append(cities)
 
     # начало блока, если бот не нашёл подходящих слов в json файлах
-    if result not in keywords['dictionary'] and city not in lst and forecast not in keywords[
-        'dictionary'] and city_name not in lst:
+    if result not in keywords['dictionary'] and city not in lst and forecast not in keywords['dictionary'] \
+            and city_name not in lst:
         keywords["dictionary"][result] = ["Я всё ещё не понимаю о чем речь, попробуй позже мне это написать!"]
         with open("keywords.json", "w") as json_file:
             json.dump(keywords.decode("utf-8"), json_file, ensure_ascii=False, indent=4, separators=(',', ': '))
         await message.reply("Я не понимаю того, что ты мне говоришь!\nПопробуй перефразировать свой вопрос...")
+
     # конец блока
 
     # если город найден в списке, отобразить погоду
     if city in lst:
-        try:
-            weather: WeatherInfo = await get_weather_for_city(city)
-        except WeatherServiceException:
-            await message.reply(WEATHER_RETRIEVAL_FAILED_MESSAGE)
-            return
+        def current_weather():
+            func_coord = cityname_to_coord(api_key_coordinates, city_name)
+            url_weather = f"https://api.weather.yandex.ru/v2/forecast?lat={func_coord[1]}" \
+                          f"&lon={func_coord[0]}&lang=ru&extra=true"
+            with open("weather_conditions.json", "r", encoding="utf-8") as condition:
+                weather_condition = json.load(condition)
 
-        response = get_message('weather_in_city_message') \
-                       .format(city, weather.status, weather.temperature) + '\n\n' + \
-                   get_advice(weather)
+            def current_weather_temp():
+                with requests.get(url_weather, headers=headers) as resp:
+                    json_result = resp.json()
+                return json_result
 
-        await message.answer(response)
+            def get_temperature_advice(curr_temp) -> str:
+                for rule, advice in temperature_rules:
+                    if curr_temp < rule:
+                        return advice
+                return ""
+
+            get_temperature_advice(current_weather_temp()["fact"]["temp"])
 
     # Прогноз погоды на 7 дней включая текущий день
     def forecast_weather_sevenDays():
@@ -161,3 +166,4 @@ async def today_date_and_time(message: types.Message):
             list_append.append(i)
             string_append = "".join(str(x) for x in list_append)
         await message.answer(f"Прогноз погоды в городе {city_name} на 7 дней:\n\n" + string_append)
+    return city_name
