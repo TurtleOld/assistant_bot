@@ -8,11 +8,8 @@ import os
 import json
 import requests
 from dotenv import load_dotenv
-from bot_messages import get_message
 from random import choice
 from weather_settings import cityname_to_coord, temperature_rules
-
-WEATHER_RETRIEVAL_FAILED_MESSAGE = get_message('weather_for_location_retrieval_failed')
 
 load_dotenv()
 admin_id = os.getenv("admin_id")
@@ -86,15 +83,11 @@ async def today_date_and_time(message: types.Message):
 
     # если город найден в списке, отобразить погоду
     if city in lst:
-        def current_weather():
-            func_coord = cityname_to_coord(api_key_coordinates, city)
-            url_weather = f"https://api.weather.yandex.ru/v2/forecast?lat={func_coord[1]}" \
-                          f"&lon={func_coord[0]}&lang=ru&extra=true"
-            with open("weather_conditions.json", "r", encoding="utf-8") as condition:
-                weather_condition = json.load(condition)
-            return url_weather
+        func_coord_current_weather = cityname_to_coord(api_key_coordinates, city)
+        url_weather = f"https://api.weather.yandex.ru/v2/forecast?lat={func_coord_current_weather[1]}" \
+                      f"&lon={func_coord_current_weather[0]}&lang=ru&extra=true"
 
-        def current_weather_temp(url_weather):
+        def current_weather_temp():
             with requests.get(url_weather, headers=headers) as resp:
                 json_result = resp.json()
             return json_result
@@ -108,19 +101,19 @@ async def today_date_and_time(message: types.Message):
         def translate_condition():
             with open("weather_conditions.json", "r", encoding="utf-8") as condition:
                 weather_condition = json.load(condition)
-            eng_cond = current_weather_temp(current_weather())['fact']['condition']
+            eng_cond = current_weather_temp()['fact']['condition']
             if eng_cond in weather_condition["condition"]:
                 return weather_condition["condition"][eng_cond]
 
         current_weather_result = f"Текущая температура в городе {city}\n\n" \
-                                 f"Температура: {current_weather_temp(current_weather())['fact']['temp']}" \
+                                 f"Температура: {current_weather_temp()['fact']['temp']}" \
                                  f"\N{Degree Sign}C\n" \
-                                 f"Ощущается как: {current_weather_temp(current_weather())['fact']['feels_like']}" \
+                                 f"Ощущается как: {current_weather_temp()['fact']['feels_like']}" \
                                  f"\N{Degree Sign}C\n" \
-                                 f"{get_temperature_advice(current_weather_temp(current_weather())['fact']['temp'])}\n" \
+                                 f"{get_temperature_advice(current_weather_temp()['fact']['temp'])}\n" \
                                  f"{translate_condition()}\n\n" \
                                  f"Атмосферное давление: <strong>" \
-                                 f"{current_weather_temp(current_weather())['fact']['pressure_mm']} мм рт. ст.</strong>"
+                                 f"{current_weather_temp()['fact']['pressure_mm']} мм рт. ст.</strong>"
         await message.answer(current_weather_result)
 
     # Прогноз погоды на 7 дней включая текущий день
