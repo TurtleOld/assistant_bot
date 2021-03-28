@@ -22,10 +22,12 @@ headers = {
 }
 
 
+# Сообщение для оповещения, что бот запущен
 async def send_to_admin(dp):
     await bot.send_message(chat_id=admin_id, text="Бот запущен!\n")
 
 
+# Приветственное сообщение, когда пользователь ещё не общался с ботом, или нажал\ввел /start or /help
 @dp.message_handler(commands=["start", "help"], user_id=[user_id_required, admin_id])
 async def start_help_commands(message: types.Message):
     await message.answer(f"<b>Привет, меня зовут Куся!</b>\n"
@@ -38,57 +40,58 @@ async def start_help_commands(message: types.Message):
                          f"Введи /start или /help для повторного отображения данного сообщения!")
 
 
+# Основной блок бота
 @dp.message_handler(user_id=[user_id_required, admin_id])
 async def today_date_and_time(message: types.Message):
-    result = message.text.lower().strip(" ")  # получаем текст сообщения от пользователя
+    user_input = message.text.lower().strip(" ")  # получаем текст сообщения от пользователя
 
-    forecast = result[:7]
-    city_name = result[8:].title()
+    # блок для погоды. forecast ищет в сообщении от пользователя слов прогноз, а city_name - название города по середине
+    forecast = user_input[:7]
+    city_name = user_input[8:].title()
 
     # Основная часть бота, при обычном общении
     with open('keywords.json', encoding="utf-8") as json_file:
         keywords = json.load(json_file)
         json_file.close()
-
-    if result in keywords['dictionary']:
-        await message.answer(choice(keywords["dictionary"][result]))
+    # если введённая фраза пользователем есть в словаре, рандомно выбрать фразу-ответ и выдать пользователю
+    if user_input in keywords['dictionary']:
+        await message.answer(choice(keywords["dictionary"][user_input]))
 
     # Условие, когда предложение начинается с обращения к боту через запятую по правилам русского языка
-    if result.startswith("Куся,"):
-        slice_name = result[6:]
+    if user_input.startswith("Куся,"):
+        slice_name = user_input[6:]
         if slice_name in keywords["dictionary"]:
-            await message.answer(choice((keywords["dictionary"][result])))
+            await message.answer(choice((keywords["dictionary"][user_input])))
 
     # Отсюда начинается блок погоды
-    city = result.title()
+    city = user_input.title()  # Введенный город делаем обязательно с большой буквы для словаря
     with open('cities.json', encoding='utf-8') as json_file:
         cities = json.load(json_file)
         json_file.close()
 
     lst = []
 
-    for item in cities['city']:
-        cities = item["name"]
+    for c in cities['city']:
+        cities = c["name"]
         lst.append(cities)
 
     # начало блока, если бот не нашёл подходящих слов в json файлах
-    if result not in keywords['dictionary'] and city not in lst and forecast not in keywords['dictionary'] \
+    if user_input not in keywords['dictionary'] and city not in lst and forecast not in keywords['dictionary'] \
             and city_name not in lst:
-        keywords["dictionary"][result] = ["Я всё ещё не понимаю о чем речь, попробуй позже мне это написать!"]
+        keywords["dictionary"][user_input] = ["Я всё ещё не понимаю о чем речь, попробуй позже мне это написать!"]
         with open("keywords.json", "w", encoding="utf-8") as json_file:
             json.dump(keywords, json_file, ensure_ascii=False, indent=4, separators=(',', ': '))
         await message.reply("Я не понимаю того, что ты мне говоришь!\nПопробуй перефразировать свой вопрос...")
-
     # конец блока
 
-    # если город найден в списке, отобразить погоду
+    # если город найден в списке, отобразить погоду за текущий день
     if city in lst:
         func_coord_current_weather = cityname_to_coord(api_key_coordinates, city)
-        url_weather = f"https://api.weather.yandex.ru/v2/forecast?lat={func_coord_current_weather[1]}" \
-                      f"&lon={func_coord_current_weather[0]}&lang=ru&extra=true"
+        url_weather_current_weather = f"https://api.weather.yandex.ru/v2/forecast?lat={func_coord_current_weather[1]}" \
+                                      f"&lon={func_coord_current_weather[0]}&lang=ru&extra=true"
 
         def current_weather_temp():
-            with requests.get(url_weather, headers=headers) as resp:
+            with requests.get(url_weather_current_weather, headers=headers) as resp:
                 json_result = resp.json()
             return json_result
 
@@ -104,6 +107,7 @@ async def today_date_and_time(message: types.Message):
             eng_cond = current_weather_temp()["fact"]["condition"]
             if eng_cond in weather_condition["condition"]:
                 return weather_condition["condition"][eng_cond]
+
         def translate_wind_direction():
             with open("weather_conditions.json", "r", encoding="utf-8") as condition:
                 weather_condition = json.load(condition)
@@ -179,8 +183,8 @@ async def today_date_and_time(message: types.Message):
     if forecast in keywords['dictionary'] and city_name in lst:
         func_result = forecast_weather_sevenDays()
         list_append = []
+        string_append = ""
         for i in func_result:
             list_append.append(i)
             string_append = "".join(str(x) for x in list_append)
         await message.answer(f"Прогноз погоды в городе {city_name} на 7 дней:\n\n" + string_append)
-    return city_name
