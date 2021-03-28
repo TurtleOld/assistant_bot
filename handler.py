@@ -101,17 +101,25 @@ async def today_date_and_time(message: types.Message):
         def translate_condition():
             with open("weather_conditions.json", "r", encoding="utf-8") as condition:
                 weather_condition = json.load(condition)
-            eng_cond = current_weather_temp()['fact']['condition']
+            eng_cond = current_weather_temp()["fact"]["condition"]
             if eng_cond in weather_condition["condition"]:
                 return weather_condition["condition"][eng_cond]
+        def translate_wind_direction():
+            with open("weather_conditions.json", "r", encoding="utf-8") as condition:
+                weather_condition = json.load(condition)
+            eng_wind_dir = current_weather_temp()["fact"]["wind_dir"]
+            if eng_wind_dir in weather_condition["wind_direction"]:
+                return weather_condition["wind_direction"][eng_wind_dir]
 
-        current_weather_result = f"Текущая температура в городе {city}\n\n" \
+        current_weather_result = f"Текущая температура в городе {city}:\n\n" \
                                  f"Температура: {current_weather_temp()['fact']['temp']}" \
                                  f"\N{Degree Sign}C\n" \
                                  f"Ощущается как: {current_weather_temp()['fact']['feels_like']}" \
                                  f"\N{Degree Sign}C\n" \
-                                 f"{get_temperature_advice(current_weather_temp()['fact']['temp'])}\n" \
-                                 f"{translate_condition()}\n\n" \
+                                 f"{get_temperature_advice(current_weather_temp()['fact']['temp'])}\n\n" \
+                                 f"{translate_condition()}\n" \
+                                 f"Ветер {translate_wind_direction()} {current_weather_temp()['fact']['wind_speed']} " \
+                                 f"м/с\n\n" \
                                  f"Атмосферное давление: <strong>" \
                                  f"{current_weather_temp()['fact']['pressure_mm']} мм рт. ст.</strong>"
         await message.answer(current_weather_result)
