@@ -1,6 +1,5 @@
 """
-В данном скрипте представлен другой скрипт, который был взят с открытого источника
-https://github.com/karvozavr/weather-bot
+В данном скрипте используется API Yandex Weather and Yandex Geocode
 """
 
 from main import bot, dp
@@ -88,24 +87,41 @@ async def today_date_and_time(message: types.Message):
     # если город найден в списке, отобразить погоду
     if city in lst:
         def current_weather():
-            func_coord = cityname_to_coord(api_key_coordinates, city_name)
+            func_coord = cityname_to_coord(api_key_coordinates, city)
             url_weather = f"https://api.weather.yandex.ru/v2/forecast?lat={func_coord[1]}" \
                           f"&lon={func_coord[0]}&lang=ru&extra=true"
             with open("weather_conditions.json", "r", encoding="utf-8") as condition:
                 weather_condition = json.load(condition)
+            return url_weather
 
-            def current_weather_temp():
-                with requests.get(url_weather, headers=headers) as resp:
-                    json_result = resp.json()
-                return json_result
+        def current_weather_temp(url_weather):
+            with requests.get(url_weather, headers=headers) as resp:
+                json_result = resp.json()
+            return json_result
 
-            def get_temperature_advice(curr_temp) -> str:
-                for rule, advice in temperature_rules:
-                    if curr_temp < rule:
-                        return advice
-                return ""
+        def get_temperature_advice(curr_temp) -> str:
+            for rule, advice in temperature_rules:
+                if curr_temp < rule:
+                    return advice
+            return ""
 
-            get_temperature_advice(current_weather_temp()["fact"]["temp"])
+        def translate_condition():
+            with open("weather_conditions.json", "r", encoding="utf-8") as condition:
+                weather_condition = json.load(condition)
+            eng_cond = current_weather_temp(current_weather())['fact']['condition']
+            if eng_cond in weather_condition["condition"]:
+                return weather_condition["condition"][eng_cond]
+
+        current_weather_result = f"Текущая температура в городе {city}\n\n" \
+                                 f"Температура: {current_weather_temp(current_weather())['fact']['temp']}" \
+                                 f"\N{Degree Sign}C\n" \
+                                 f"Ощущается как: {current_weather_temp(current_weather())['fact']['feels_like']}" \
+                                 f"\N{Degree Sign}C\n" \
+                                 f"{get_temperature_advice(current_weather_temp(current_weather())['fact']['temp'])}\n" \
+                                 f"{translate_condition()}\n\n" \
+                                 f"Атмосферное давление: <strong>" \
+                                 f"{current_weather_temp(current_weather())['fact']['pressure_mm']} мм рт. ст.</strong>"
+        await message.answer(current_weather_result)
 
     # Прогноз погоды на 7 дней включая текущий день
     def forecast_weather_sevenDays():
