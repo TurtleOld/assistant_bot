@@ -79,8 +79,8 @@ async def today_date_and_time(message: types.Message):
     if result not in keywords['dictionary'] and city not in lst and forecast not in keywords['dictionary'] \
             and city_name not in lst:
         keywords["dictionary"][result] = ["Я всё ещё не понимаю о чем речь, попробуй позже мне это написать!"]
-        with open("keywords.json", "w") as json_file:
-            json.dump(keywords.decode("utf-8"), json_file, ensure_ascii=False, indent=4, separators=(',', ': '))
+        with open("keywords.json", "w", encoding="utf-8") as json_file:
+            json.dump(keywords, json_file, ensure_ascii=False, indent=4, separators=(',', ': '))
         await message.reply("Я не понимаю того, что ты мне говоришь!\nПопробуй перефразировать свой вопрос...")
 
     # конец блока
