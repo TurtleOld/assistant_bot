@@ -105,7 +105,10 @@ async def today_date_and_time(message: types.Message):
         cities = c["name"]
         lst.append(cities)
 
-    if user_input not in result_iteration and slice_name not in result_iteration and city not in lst and forecast not in questions and city_name not in lst:
+    slice_name = user_input[6:]
+    if user_input not in result_iteration and slice_name not in result_iteration and city not in lst and \
+            forecast not in questions and city_name not in lst:
+        print(":")
         cursor.execute(
             "INSERT INTO keywords(question, phrase) VALUES ('" + user_input + "', '{Я всё ещё не понимаю о чем "
                                                                               "речь, "
