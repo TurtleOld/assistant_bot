@@ -20,7 +20,7 @@ api_key_forecast = os.getenv("api_key_forecast")
 
 # settings database
 dbname = os.getenv("dbname")
-user = os.getenv("username")
+user = os.getenv("username").lower()
 password = os.getenv("password")
 host = os.getenv("host")
 port = os.getenv("port")
@@ -37,6 +37,9 @@ connection = psycopg2.connect(
     host=host,
     port=port
 )
+
+connection.autocommit = True
+cursor = connection.cursor()
 
 
 # Сообщение для оповещения, что бот запущен
@@ -60,25 +63,35 @@ async def start_help_commands(message: types.Message):
 # Основной блок бота
 @dp.message_handler(user_id=[user_id_required, admin_id])
 async def today_date_and_time(message: types.Message):
+
     user_input = message.text.lower().strip(" ")  # получаем текст сообщения от пользователя
 
     # блок для погоды. forecast ищет в сообщении от пользователя слов прогноз, а city_name - название города по середине
     forecast = user_input[:7]
     city_name = user_input[8:].title()
 
+
+    cursor.execute("select question from keywords")
+    questions = cursor.fetchall()
+    iteration = [x[0] for x in questions]
+    result_iteration = " ".join(iteration)
+
     # Основная часть бота, при обычном общении
-    with open('keywords.json', encoding="utf-8") as json_file:
-        keywords = json.load(json_file)
-        json_file.close()
     # если введённая фраза пользователем есть в словаре, рандомно выбрать фразу-ответ и выдать пользователю
-    if user_input in keywords['dictionary']:
-        await message.answer(choice(keywords["dictionary"][user_input]))
+    cursor.execute("select phrase from keywords where question = '" + user_input + "' order by random() limit 1")
+    result_query = cursor.fetchall()
+    if result_query:
+        await message.answer(", ".join(result_query[0][0]))
 
     # Условие, когда предложение начинается с обращения к боту через запятую по правилам русского языка
-    if user_input.startswith("Куся,"):
+    if user_input.startswith("куся"):
         slice_name = user_input[6:]
-        if slice_name in keywords["dictionary"]:
-            await message.answer(choice((keywords["dictionary"][user_input])))
+        if slice_name in result_iteration:
+            cursor.execute(
+                "select phrase from keywords where question = '" + slice_name + "' order by random() limit 1")
+            r_kusya = cursor.fetchall()
+            r_question = ", ".join(r_kusya[0][0])
+            await message.answer(r_question)
 
     # Отсюда начинается блок погоды
     city = user_input.title()  # Введенный город делаем обязательно с большой буквы для словаря
@@ -92,14 +105,12 @@ async def today_date_and_time(message: types.Message):
         cities = c["name"]
         lst.append(cities)
 
-    # начало блока, если бот не нашёл подходящих слов в json файлах
-    if user_input not in keywords['dictionary'] and city not in lst and forecast not in keywords['dictionary'] \
-            and city_name not in lst:
-        keywords["dictionary"][user_input] = ["Я всё ещё не понимаю о чем речь, попробуй позже мне это написать!"]
-        with open("keywords.json", "w", encoding="utf-8") as json_file:
-            json.dump(keywords, json_file, ensure_ascii=False, indent=4, separators=(',', ': '))
-        await message.reply("Я не понимаю того, что ты мне говоришь!\nПопробуй перефразировать свой вопрос...")
-    # конец блока
+    if user_input not in result_iteration and slice_name not in result_iteration and city not in lst and forecast not in questions and city_name not in lst:
+        cursor.execute(
+            "INSERT INTO keywords(question, phrase) VALUES ('" + user_input + "', '{Я всё ещё не понимаю о чем "
+                                                                              "речь, "
+                                                                              "попробуй позже мне это написать!}')")
+        await message.answer("Я не понимаю того, что ты мне говоришь!\nПопробуй перефразировать свой вопрос...")
 
     # если город найден в списке, отобразить погоду за текущий день
     if city in lst:
@@ -197,11 +208,15 @@ async def today_date_and_time(message: types.Message):
                       f'{translate_condition_evening()}\n' \
                       f'Давление: {item["parts"]["evening"]["pressure_mm"]} мм рт. ст.\n\n'
 
-    if forecast in keywords['dictionary'] and city_name in lst:
-        func_result = forecast_weather_sevenDays()
-        list_append = []
-        string_append = ""
-        for i in func_result:
-            list_append.append(i)
-            string_append = "".join(str(x) for x in list_append)
-        await message.answer(f"Прогноз погоды в городе {city_name} на 7 дней:\n\n" + string_append)
+    for question in questions:
+        res_question = "".join(question)
+        if forecast in res_question and city_name in lst:
+            func_result = forecast_weather_sevenDays()
+            list_append = []
+            string_append = ""
+            for i in func_result:
+                list_append.append(i)
+                string_append = "".join(str(x) for x in list_append)
+            await message.answer(f"Прогноз погоды в городе {city_name} на 7 дней:\n\n" + string_append)
+
+
