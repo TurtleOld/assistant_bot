@@ -7,6 +7,7 @@ from aiogram import types
 import os
 import json
 import requests
+import psycopg2
 from dotenv import load_dotenv
 from random import choice
 from weather_settings import cityname_to_coord, temperature_rules
@@ -17,9 +18,25 @@ user_id_required = os.getenv("user_id_required")
 api_key_coordinates = os.getenv("api_key_coordinates")
 api_key_forecast = os.getenv("api_key_forecast")
 
+# settings database
+dbname = os.getenv("dbname")
+user = os.getenv("username")
+password = os.getenv("password")
+host = os.getenv("host")
+port = os.getenv("port")
+
 headers = {
     "X-Yandex-API-Key": api_key_forecast,
 }
+
+# Подключение к базе данных
+connection = psycopg2.connect(
+    dbname=dbname,
+    user=user,
+    password=password,
+    host=host,
+    port=port
+)
 
 
 # Сообщение для оповещения, что бот запущен
