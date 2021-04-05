@@ -9,7 +9,6 @@ import json
 import requests
 import psycopg2
 from dotenv import load_dotenv
-from random import choice
 from weather_settings import cityname_to_coord, temperature_rules
 
 load_dotenv()
@@ -63,37 +62,17 @@ async def start_help_commands(message: types.Message):
 # Основной блок бота
 @dp.message_handler(user_id=[user_id_required, admin_id])
 async def today_date_and_time(message: types.Message):
-
     user_input = message.text.lower().strip(" ")  # получаем текст сообщения от пользователя
 
     # блок для погоды. forecast ищет в сообщении от пользователя слов прогноз, а city_name - название города по середине
     forecast = user_input[:7]
     city_name = user_input[8:].title()
-
+    slice_name = user_input[6:]
 
     cursor.execute("select question from keywords")
     questions = cursor.fetchall()
     iteration = [x[0] for x in questions]
-    result_iteration = " ".join(iteration)
 
-    # Основная часть бота, при обычном общении
-    # если введённая фраза пользователем есть в словаре, рандомно выбрать фразу-ответ и выдать пользователю
-    cursor.execute("select phrase from keywords where question = '" + user_input + "' order by random() limit 1")
-    result_query = cursor.fetchall()
-    if result_query:
-        await message.answer(", ".join(result_query[0][0]))
-
-    # Условие, когда предложение начинается с обращения к боту через запятую по правилам русского языка
-    if user_input.startswith("куся"):
-        slice_name = user_input[6:]
-        if slice_name in result_iteration:
-            cursor.execute(
-                "select phrase from keywords where question = '" + slice_name + "' order by random() limit 1")
-            r_kusya = cursor.fetchall()
-            r_question = ", ".join(r_kusya[0][0])
-            await message.answer(r_question)
-
-    # Отсюда начинается блок погоды
     city = user_input.title()  # Введенный город делаем обязательно с большой буквы для словаря
     with open('cities.json', encoding='utf-8') as json_file:
         cities = json.load(json_file)
@@ -105,8 +84,24 @@ async def today_date_and_time(message: types.Message):
         cities = c["name"]
         lst.append(cities)
 
-    slice_name = user_input[6:]
-    if user_input not in result_iteration and slice_name not in result_iteration and city not in lst and \
+    # Основная часть бота, при обычном общении
+    # если введённая фраза пользователем есть в словаре, рандомно выбрать фразу-ответ и выдать пользователю
+    cursor.execute("select phrase from keywords where question = '" + user_input + "' order by random() limit 1")
+    result_query = cursor.fetchall()
+    if result_query:
+        await message.answer(", ".join(result_query[0][0]))
+
+    # Условие, когда предложение начинается с обращения к боту через запятую по правилам русского языка
+    elif user_input.startswith("куся"):
+        slice_name = user_input[6:]
+        if slice_name in iteration:
+            cursor.execute(
+                "select phrase from keywords where question = '" + slice_name + "' order by random() limit 1")
+            r_kusya = cursor.fetchall()
+            r_question = ", ".join(r_kusya[0][0])
+            await message.answer(r_question)
+
+    elif user_input not in iteration and slice_name not in iteration and city not in lst and \
             forecast not in questions and city_name not in lst:
         print(":")
         cursor.execute(
@@ -221,5 +216,3 @@ async def today_date_and_time(message: types.Message):
                 list_append.append(i)
                 string_append = "".join(str(x) for x in list_append)
             await message.answer(f"Прогноз погоды в городе {city_name} на 7 дней:\n\n" + string_append)
-
-
