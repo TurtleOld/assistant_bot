@@ -92,7 +92,7 @@ async def today_date_and_time(message: types.Message):
         await message.answer(", ".join(result_query[0][0]))
 
     # Условие, когда предложение начинается с обращения к боту через запятую по правилам русского языка
-    elif user_input.startswith("куся"):
+    if user_input.startswith("куся"):
         slice_name = user_input[6:]
         if slice_name in iteration:
             cursor.execute(
@@ -101,9 +101,8 @@ async def today_date_and_time(message: types.Message):
             r_question = ", ".join(r_kusya[0][0])
             await message.answer(r_question)
 
-    elif user_input not in iteration and slice_name not in iteration and city not in lst and \
-            forecast not in questions and city_name not in lst:
-        print(":")
+    if user_input not in iteration and slice_name not in iteration and city not in lst and \
+            forecast not in iteration and city_name not in lst:
         cursor.execute(
             "INSERT INTO keywords(question, phrase) VALUES ('" + user_input + "', '{Я всё ещё не понимаю о чем "
                                                                               "речь, "
@@ -113,7 +112,7 @@ async def today_date_and_time(message: types.Message):
     # если город найден в списке, отобразить погоду за текущий день
     if city in lst:
         func_coord_current_weather = cityname_to_coord(api_key_coordinates, city)
-        url_weather_current_weather = f"https://api.weather.yandex.ru/v2/forecast?lat={func_coord_current_weather[1]}" \
+        url_weather_current_weather = f"https://api.weather.yandex.ru/v2/informers?lat={func_coord_current_weather[1]}" \
                                       f"&lon={func_coord_current_weather[0]}&lang=ru&extra=true"
 
         def current_weather_temp():
@@ -155,64 +154,64 @@ async def today_date_and_time(message: types.Message):
         await message.answer(current_weather_result)
 
     # Прогноз погоды на 7 дней включая текущий день
-    def forecast_weather_sevenDays():
-        func_coord = cityname_to_coord(api_key_coordinates, city_name)
-        url_weather = f"https://api.weather.yandex.ru/v2/forecast?lat={func_coord[1]}" \
-                      f"&lon={func_coord[0]}&lang=ru&extra=true"
-        with open("weather_conditions.json", "r", encoding="utf-8") as condition:
-            weather_condition = json.load(condition)
-        with requests.get(url_weather, headers=headers) as resp:
-            json_result = resp.json()
-            for item in json_result["forecasts"]:
-                def translate_condition_night():
-                    eng_cond = item["parts"]["night"]["condition"]
-                    if eng_cond in weather_condition["condition"]:
-                        return weather_condition["condition"][eng_cond]
-
-                def translate_condition_morning():
-                    eng_cond = item["parts"]["morning"]["condition"]
-                    if eng_cond in weather_condition["condition"]:
-                        return weather_condition["condition"][eng_cond]
-
-                def translate_condition_day():
-                    eng_cond = item["parts"]["day"]["condition"]
-                    if eng_cond in weather_condition["condition"]:
-                        return weather_condition["condition"][eng_cond]
-
-                def translate_condition_evening():
-                    eng_cond = item["parts"]["evening"]["condition"]
-                    if eng_cond in weather_condition["condition"]:
-                        return weather_condition["condition"][eng_cond]
-
-                yield f'<b>Дата: {item["date"]}\n</b>' \
-                      f'------\n' \
-                      f'Ночная температура: {item["parts"]["night"]["temp_avg"]}\N{Degree Sign}C\n' \
-                      f'Ощущается температура как: {item["parts"]["night"]["feels_like"]}\N{Degree Sign}C\n' \
-                      f'{translate_condition_night()}\n' \
-                      f'Давление: {item["parts"]["night"]["pressure_mm"]} мм рт. ст.\n' \
-                      f'------\n' \
-                      f'Утренняя температура: {item["parts"]["morning"]["temp_avg"]}\N{Degree Sign}C\n' \
-                      f'Ощущается температура как: {item["parts"]["morning"]["feels_like"]}\N{Degree Sign}C\n' \
-                      f'{translate_condition_morning()}\n' \
-                      f'Давление: {item["parts"]["morning"]["pressure_mm"]} мм рт. ст.\n' \
-                      f'------\n' \
-                      f'Дневная температура: {item["parts"]["day"]["temp_avg"]}\N{Degree Sign}C\n' \
-                      f'Ощущается температура как: {item["parts"]["day"]["feels_like"]}\N{Degree Sign}C\n' \
-                      f'{translate_condition_day()}\n' \
-                      f'Давление: {item["parts"]["day"]["pressure_mm"]} мм рт. ст.\n' \
-                      f'------\n' \
-                      f'Вечерняя температура: {item["parts"]["evening"]["temp_avg"]}\N{Degree Sign}C\n' \
-                      f'Ощущается температура как: {item["parts"]["evening"]["feels_like"]}\N{Degree Sign}C\n' \
-                      f'{translate_condition_evening()}\n' \
-                      f'Давление: {item["parts"]["evening"]["pressure_mm"]} мм рт. ст.\n\n'
-
-    for question in questions:
-        res_question = "".join(question)
-        if forecast in res_question and city_name in lst:
-            func_result = forecast_weather_sevenDays()
-            list_append = []
-            string_append = ""
-            for i in func_result:
-                list_append.append(i)
-                string_append = "".join(str(x) for x in list_append)
-            await message.answer(f"Прогноз погоды в городе {city_name} на 7 дней:\n\n" + string_append)
+    # def forecast_weather_sevenDays():
+    #     func_coord = cityname_to_coord(api_key_coordinates, city_name)
+    #     url_weather = f"https://api.weather.yandex.ru/v2/forecast?lat={func_coord[1]}" \
+    #                   f"&lon={func_coord[0]}&lang=ru&extra=true"
+    #     with open("weather_conditions.json", "r", encoding="utf-8") as condition:
+    #         weather_condition = json.load(condition)
+    #     with requests.get(url_weather, headers=headers) as resp:
+    #         json_result = resp.json()
+    #         for item in json_result["forecasts"]:
+    #             def translate_condition_night():
+    #                 eng_cond = item["parts"]["night"]["condition"]
+    #                 if eng_cond in weather_condition["condition"]:
+    #                     return weather_condition["condition"][eng_cond]
+    #
+    #             def translate_condition_morning():
+    #                 eng_cond = item["parts"]["morning"]["condition"]
+    #                 if eng_cond in weather_condition["condition"]:
+    #                     return weather_condition["condition"][eng_cond]
+    #
+    #             def translate_condition_day():
+    #                 eng_cond = item["parts"]["day"]["condition"]
+    #                 if eng_cond in weather_condition["condition"]:
+    #                     return weather_condition["condition"][eng_cond]
+    #
+    #             def translate_condition_evening():
+    #                 eng_cond = item["parts"]["evening"]["condition"]
+    #                 if eng_cond in weather_condition["condition"]:
+    #                     return weather_condition["condition"][eng_cond]
+    #
+    #             yield f'<b>Дата: {item["date"]}\n</b>' \
+    #                   f'------\n' \
+    #                   f'Ночная температура: {item["parts"]["night"]["temp_avg"]}\N{Degree Sign}C\n' \
+    #                   f'Ощущается температура как: {item["parts"]["night"]["feels_like"]}\N{Degree Sign}C\n' \
+    #                   f'{translate_condition_night()}\n' \
+    #                   f'Давление: {item["parts"]["night"]["pressure_mm"]} мм рт. ст.\n' \
+    #                   f'------\n' \
+    #                   f'Утренняя температура: {item["parts"]["morning"]["temp_avg"]}\N{Degree Sign}C\n' \
+    #                   f'Ощущается температура как: {item["parts"]["morning"]["feels_like"]}\N{Degree Sign}C\n' \
+    #                   f'{translate_condition_morning()}\n' \
+    #                   f'Давление: {item["parts"]["morning"]["pressure_mm"]} мм рт. ст.\n' \
+    #                   f'------\n' \
+    #                   f'Дневная температура: {item["parts"]["day"]["temp_avg"]}\N{Degree Sign}C\n' \
+    #                   f'Ощущается температура как: {item["parts"]["day"]["feels_like"]}\N{Degree Sign}C\n' \
+    #                   f'{translate_condition_day()}\n' \
+    #                   f'Давление: {item["parts"]["day"]["pressure_mm"]} мм рт. ст.\n' \
+    #                   f'------\n' \
+    #                   f'Вечерняя температура: {item["parts"]["evening"]["temp_avg"]}\N{Degree Sign}C\n' \
+    #                   f'Ощущается температура как: {item["parts"]["evening"]["feels_like"]}\N{Degree Sign}C\n' \
+    #                   f'{translate_condition_evening()}\n' \
+    #                   f'Давление: {item["parts"]["evening"]["pressure_mm"]} мм рт. ст.\n\n'
+    #
+    # for question in questions:
+    #     res_question = "".join(question)
+    #     if forecast in res_question and city_name in lst:
+    #         func_result = forecast_weather_sevenDays()
+    #         list_append = []
+    #         string_append = ""
+    #         for i in func_result:
+    #             list_append.append(i)
+    #             string_append = "".join(str(x) for x in list_append)
+    #         await message.answer(f"Прогноз погоды в городе {city_name} на 7 дней:\n\n" + string_append)
