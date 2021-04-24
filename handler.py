@@ -47,7 +47,7 @@ async def send_to_admin(dp):
 
 
 # Приветственное сообщение, когда пользователь ещё не общался с ботом, или нажал\ввел /start or /help
-@dp.message_handler(commands=["start", "help"], user_id=[user_id_required, admin_id])
+@dp.message_handler(commands=["start", "help"])
 async def start_help_commands(message: types.Message):
     await message.answer(f"<b>Привет, меня зовут Куся!</b>\n"
                          f"Я умею общаться с людьми, но пока только учусь, "
@@ -60,8 +60,8 @@ async def start_help_commands(message: types.Message):
 
 
 # Основной блок бота
-@dp.message_handler(user_id=[user_id_required, admin_id])
-async def today_date_and_time(message: types.Message):
+@dp.message_handler()
+async def main_func(message: types.Message):
     user_input = message.text.lower().strip(" ")  # получаем текст сообщения от пользователя
 
     # блок для погоды. forecast ищет в сообщении от пользователя слов прогноз, а city_name - название города по середине
