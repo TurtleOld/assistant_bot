@@ -96,7 +96,7 @@ async def main_func(message: types.Message):
         slice_name = user_input[6:]
         if slice_name in iteration:
             cursor.execute(
-                "select phrase from keywords where question = '" + slice_name + "' order by random() limit 1")
+                f"select phrase from keywords where question = '{slice_name}' order by random() limit 1")
             r_kusya = cursor.fetchall()
             r_question = ", ".join(r_kusya[0][0])
             await message.answer(r_question)
