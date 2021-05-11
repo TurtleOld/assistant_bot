@@ -86,7 +86,7 @@ async def main_func(message: types.Message):
 
     # Основная часть бота, при обычном общении
     # если введённая фраза пользователем есть в словаре, рандомно выбрать фразу-ответ и выдать пользователю
-    cursor.execute("select phrase from keywords where question = '" + user_input + "' order by random() limit 1")
+    cursor.execute(f"select phrase from keywords where question = '{user_input}' order by random() limit 1")
     result_query = cursor.fetchall()
     if result_query:
         await message.answer(", ".join(result_query[0][0]))
@@ -104,7 +104,7 @@ async def main_func(message: types.Message):
     if user_input not in iteration and slice_name not in iteration and city not in lst and \
             forecast not in iteration and city_name not in lst:
         cursor.execute(
-            "INSERT INTO keywords(question, phrase) VALUES ('" + user_input + "', '{Я всё ещё не понимаю о чем "
+            f"INSERT INTO keywords(question, phrase) VALUES ('{user_input}', '{Я всё ещё не понимаю о чем "
                                                                               "речь, "
                                                                               "попробуй позже мне это написать!}')")
         await message.answer("Я не понимаю того, что ты мне говоришь!\nПопробуй перефразировать свой вопрос...")
