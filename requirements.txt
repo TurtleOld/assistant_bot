@@ -1,7 +1,8 @@
-aiogram~=2.11.2
-asyncio~=3.4.3
+aiogram>=2.11.2
+asyncio>=3.4.3
 pip
-python-dotenv~=0.15.0
+python-dotenv>=0.15.0
 aiohttp~=3.7.4.post0
-requests~=2.25.1
-psycopg2
+requests>=2.25.1
+psycopg2>=2.8.6
+pdf2docx>=0.5.2
