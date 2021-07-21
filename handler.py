@@ -104,7 +104,7 @@ async def main_func(message: types.Message):
     if user_input not in iteration and slice_name not in iteration and city not in lst and \
             forecast not in iteration and city_name not in lst:
         cursor.execute(
-            f"INSERT INTO keywords(question, phrase) VALUES ('{user_input}', '{Я всё ещё не понимаю о чем "
+            "INSERT INTO keywords(question, phrase) VALUES ('" + user_input + "', '{Я всё ещё не понимаю о чем "
                                                                               "речь, "
                                                                               "попробуй позже мне это написать!}')")
         await message.answer("Я не понимаю того, что ты мне говоришь!\nПопробуй перефразировать свой вопрос...")
