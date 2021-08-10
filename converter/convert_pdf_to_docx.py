@@ -30,3 +30,8 @@ async def convert_pdf_to_docx(message: types.Message):
 
         await bot.send_message(user_id, "Пожалуйста, вот твой готовый файл в формате DOCX:")
         await bot.send_document(user_id, open(docx_file, "rb"))
+
+        path_to_file = "converter/documents/"
+        files = listdir(path_to_file)
+        for file_r in files:
+            remove(path_to_file + file_r)
