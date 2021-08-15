@@ -16,6 +16,6 @@ dp = Dispatcher(bot, loop=loop)
 
 if __name__ == "__main__":
     from handler import dp, send_to_admin
-    from converter.convert_pdf_to_docx import dp
+    from convert_pdf_to_docx import dp
     executor.start_polling(dp, on_startup=send_to_admin, skip_updates=True)
 # 
