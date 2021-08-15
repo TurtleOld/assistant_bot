@@ -4,9 +4,10 @@ WORKDIR /usr/src/app
 
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
-RUN apt-get update && apt-get install -y --no-install-recommends locales && apt-get install -y --no-install-recommends nano \
- && apt-get clean \
- && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends locales && apt-get install ffmpeg libsm6 libxext6  -y  \
+    && apt-get install -y --no-install-recommends nano \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Locale
 RUN sed -i -e \
