@@ -8,6 +8,7 @@ import os
 import json
 import requests
 import psycopg2
+import logging
 from dotenv import load_dotenv
 from weather_settings import cityname_to_coord, temperature_rules
 
@@ -64,6 +65,13 @@ async def start_help_commands(message: types.Message):
 async def main_func(message: types.Message):
     user_input = message.text.lower().strip(" ")  # получаем текст сообщения от пользователя
 
+    # Логирование сообщений боту:
+    message_to_bot = f"Message from {message.chat.full_name} id: {message.chat.id} text: {message.text} in {message.date} "
+
+    file_log = open("bot\message_to_bot.log", "a", encoding="utf-8")
+    file_log.write(f"{message_to_bot}\n")
+    file_log.close()
+
     # блок для погоды. forecast ищет в сообщении от пользователя слов прогноз, а city_name - название города по середине
     forecast = user_input[:7]
     city_name = user_input[8:].title()
@@ -74,7 +82,7 @@ async def main_func(message: types.Message):
     iteration = [x[0] for x in questions]
 
     city = user_input.title()  # Введенный город делаем обязательно с большой буквы для словаря
-    with open('cities.json', encoding='utf-8') as json_file:
+    with open("bot\cities.json", encoding='utf-8') as json_file:
         cities = json.load(json_file)
         json_file.close()
 
@@ -127,7 +135,7 @@ async def main_func(message: types.Message):
             return ""
 
         def translate_condition():
-            with open("weather_conditions.json", "r", encoding="utf-8") as condition:
+            with open("bot\weather_conditions.json", "r", encoding="utf-8") as condition:
                 weather_condition = json.load(condition)
             eng_cond = current_weather_temp()["fact"]["condition"]
             if eng_cond in weather_condition["condition"]:
