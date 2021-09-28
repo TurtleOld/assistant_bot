@@ -37,7 +37,7 @@ connection = psycopg2.connect(
     port=port
 )
 
-logging.basicConfig(filename="error.log", encoding="utf-8", filemode="w", level=logging.DEBUG)
+
 
 connection.autocommit = True
 cursor = connection.cursor()
@@ -66,12 +66,8 @@ async def start_help_commands(message: types.Message):
 async def main_func(message: types.Message):
     user_input = message.text.lower().strip(" ")  # получаем текст сообщения от пользователя
 
-    # Логирование сообщений боту:
-    message_to_bot = f"Message from {message.chat.full_name} id: {message.chat.id} text: {message.text} in {message.date} "
-
-    file_log = open("bot\message_to_bot.log", "a", encoding="utf-8")
-    file_log.write(f"{message_to_bot}\n")
-    file_log.close()
+    # Логирование:
+    logging.basicConfig(filename="error.log", encoding="utf-8", filemode="w", level=logging.DEBUG)
 
     # блок для погоды. forecast ищет в сообщении от пользователя слов прогноз, а city_name - название города по середине
     forecast = user_input[:7]
