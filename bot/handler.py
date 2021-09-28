@@ -1,5 +1,5 @@
 """
-В данном скрипте используется API Yandex Weather and Yandex Geocode
+In this is program used API Yandex Weather and API Yandex Geocode
 """
 from main import bot, dp
 from aiogram import types
