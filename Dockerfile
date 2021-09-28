@@ -22,4 +22,4 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 COPY . .
 
-CMD [ "python", "./main.py" ]
+CMD [ "python", "./bot/main.py" ]
