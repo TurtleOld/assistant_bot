@@ -1,7 +1,6 @@
 """
 В данном скрипте используется API Yandex Weather and Yandex Geocode
 """
-
 from main import bot, dp
 from aiogram import types
 import os
@@ -37,6 +36,8 @@ connection = psycopg2.connect(
     host=host,
     port=port
 )
+
+logging.basicConfig(filename="error.log", encoding="utf-8", filemode="w", level=logging.DEBUG)
 
 connection.autocommit = True
 cursor = connection.cursor()
