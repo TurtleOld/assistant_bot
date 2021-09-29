@@ -7,7 +7,7 @@ import os
 import json
 import requests
 import psycopg2
-import logging
+import logging.config
 from dotenv import load_dotenv
 from weather_settings import cityname_to_coord, temperature_rules
 
@@ -28,6 +28,7 @@ headers = {
     "X-Yandex-API-Key": api_key_forecast,
 }
 
+
 # Подключение к базе данных
 connection = psycopg2.connect(
     dbname=dbname,
@@ -36,8 +37,6 @@ connection = psycopg2.connect(
     host=host,
     port=port
 )
-
-
 
 connection.autocommit = True
 cursor = connection.cursor()
@@ -66,8 +65,10 @@ async def start_help_commands(message: types.Message):
 async def main_func(message: types.Message):
     user_input = message.text.lower().strip(" ")  # получаем текст сообщения от пользователя
 
-    # Логирование:
-    logging.basicConfig(filename="error.log", encoding="utf-8", filemode="w", level=logging.DEBUG)
+    # Логирование
+    logging.basicConfig(filename="error.log", encoding="utf-8", format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+    logging.warning(f"Message from {message.chat.full_name} with ID: {message.chat.id} and text: {message.text}.")
+
 
     # блок для погоды. forecast ищет в сообщении от пользователя слов прогноз, а city_name - название города по середине
     forecast = user_input[:7]
@@ -79,10 +80,9 @@ async def main_func(message: types.Message):
     iteration = [x[0] for x in questions]
 
     city = user_input.title()  # Введенный город делаем обязательно с большой буквы для словаря
-    with open("bot\cities.json", encoding='utf-8') as json_file:
+    with open("bot/cities.json", encoding="utf-8") as json_file:
         cities = json.load(json_file)
         json_file.close()
-
     lst = []
 
     for c in cities['city']:
