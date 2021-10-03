@@ -28,7 +28,6 @@ headers = {
     "X-Yandex-API-Key": api_key_forecast,
 }
 
-
 # Подключение к базе данных
 connection = psycopg2.connect(
     dbname=dbname,
@@ -66,9 +65,9 @@ async def main_func(message: types.Message):
     user_input = message.text.lower().strip(" ")  # получаем текст сообщения от пользователя
 
     # Логирование
-    logging.basicConfig(filename="error.log", encoding="utf-8", format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+    logging.basicConfig(filename="error.log", encoding="utf-8", format='%(asctime)s - %(message)s',
+                        datefmt='%d-%b-%y %H:%M:%S')
     logging.warning(f"Message from {message.chat.full_name} with ID: {message.chat.id} and text: {message.text}.")
-
 
     # блок для погоды. forecast ищет в сообщении от пользователя слов прогноз, а city_name - название города по середине
     forecast = user_input[:7]
