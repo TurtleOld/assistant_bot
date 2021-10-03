@@ -17,4 +17,3 @@ dp = Dispatcher(bot, loop=loop)
 if __name__ == "__main__":
     from handler import dp, send_to_admin
     executor.start_polling(dp, on_startup=send_to_admin, skip_updates=True)
-# 
