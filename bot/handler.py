@@ -116,7 +116,7 @@ async def main_func(message: types.Message):
     # если город найден в списке, отобразить погоду за текущий день
     if city in lst:
         func_coord_current_weather = cityname_to_coord(api_key_coordinates, city)
-        url_weather_current_weather = f"https://api.weather.yandex.ru/v2/informers?lat={func_coord_current_weather[1]}" \
+        url_weather_current_weather = f"https://api.weather.yandex.ru/v2/informers?lat={func_coord_current_weather[1]}"\
                                       f"&lon={func_coord_current_weather[0]}&lang=ru&extra=true"
 
         def current_weather_temp():
